@@ -1,0 +1,27 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+
+## Build
+publish/
+artifacts/
+
+## Environment
+.env
+.env.*
+appsettings.*.local.json
+
+## Node / k6
+node_modules/
+*.js.map
+dist/
+
+## Test results
+TestResults/
+*.trx
+k6-results.json
+coverage/

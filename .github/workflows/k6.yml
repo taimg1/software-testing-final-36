@@ -1,0 +1,92 @@
+name: k6 Performance Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/Feedback.Api/**'
+      - 'tests/Feedback.Api.Tests.Performance/**'
+  workflow_dispatch:
+    inputs:
+      test-type:
+        description: 'k6 test type to run'
+        required: true
+        default: smoke
+        type: choice
+        options: [smoke, load, stress]
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: feedback
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Restore and Build
+        run: |
+          dotnet restore Feedback.slnx
+          dotnet build Feedback.slnx --no-restore
+
+      - name: Start API
+        run: |
+          dotnet run --project src/Feedback.Api --no-build &
+        env:
+          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=feedback;Username=postgres;Password=postgres"
+          ASPNETCORE_URLS: "http://localhost:5067"
+
+      - name: Wait for API
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:5067/health/ready; then
+              echo "API is ready"
+              break
+            fi
+            echo "Waiting... ($i)"
+            sleep 2
+          done
+
+      - name: Determine test type
+        id: test-type
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "type=smoke" >> $GITHUB_OUTPUT
+          else
+            echo "type=${{ inputs.test-type }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run k6
+        run: |
+          k6 run \
+            -e BASE_URL=http://localhost:5067 \
+            tests/Feedback.Api.Tests.Performance/scripts/${{ steps.test-type.outputs.type }}-test.ts \
+            --summary-export=k6-results.json
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: k6-results-${{ steps.test-type.outputs.type }}
+          path: k6-results.json
