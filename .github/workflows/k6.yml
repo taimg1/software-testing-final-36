@@ -2,7 +2,7 @@ name: k6 Performance Tests
 
 on:
   pull_request:
-    branches: [main]
+    branches: [master]
     paths:
       - 'src/Feedback.Api/**'
       - 'tests/Feedback.Api.Tests.Performance/**'
