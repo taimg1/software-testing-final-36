@@ -8,10 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSingleton(TimeProvider.System);
 
-// --- ДОДАНО ДЛЯ OPENAPI (SWAGGER) ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// ------------------------------------
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -24,14 +22,11 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// --- ДОДАНО ДЛЯ OPENAPI (SWAGGER) ---
-// Зазвичай документацію відкривають лише в середовищі розробки
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// ------------------------------------
 
 using (var scope = app.Services.CreateScope())
 {
