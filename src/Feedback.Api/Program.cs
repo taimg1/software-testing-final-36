@@ -1,5 +1,6 @@
-using Feedback.Api.Data;
-using Feedback.Api.Services;
+using Feedback.Application.Abstractions;
+using Feedback.Infrastructure.Persistence;
+using Feedback.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,30 +9,26 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSingleton(TimeProvider.System);
 
-// --- ДОДАНО ДЛЯ OPENAPI (SWAGGER) ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// ------------------------------------
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddValidatorsFromAssemblyContaining<Feedback.Application.ApplicationAssembly>();
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>("database");
 
 var app = builder.Build();
 
-// --- ДОДАНО ДЛЯ OPENAPI (SWAGGER) ---
-// Зазвичай документацію відкривають лише в середовищі розробки
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// ------------------------------------
 
 using (var scope = app.Services.CreateScope())
 {

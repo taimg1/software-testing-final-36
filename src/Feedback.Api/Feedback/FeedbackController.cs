@@ -1,7 +1,7 @@
-using Feedback.Api.Domain;
-using Feedback.Api.Feedback.Requests;
-using Feedback.Api.Feedback.Responses;
-using Feedback.Api.Services;
+using Feedback.Application.Abstractions;
+using Feedback.Application.Feedback.Requests;
+using Feedback.Application.Feedback.Responses;
+using Feedback.Domain;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;

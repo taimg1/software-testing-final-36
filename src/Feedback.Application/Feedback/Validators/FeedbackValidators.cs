@@ -1,7 +1,7 @@
 using FluentValidation;
-using Feedback.Api.Feedback.Requests;
+using Feedback.Application.Feedback.Requests;
 
-namespace Feedback.Api.Feedback.Validations;
+namespace Feedback.Application.Feedback.Validators;
 
 public class CreateFeedbackRequestValidator : AbstractValidator<CreateFeedbackRequest>
 {
