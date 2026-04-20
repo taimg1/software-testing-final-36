@@ -1,4 +1,4 @@
-namespace Feedback.Api.Feedback.Responses;
+namespace Feedback.Application.Feedback.Responses;
 
 public record FeedbackResponse(
     int Id,

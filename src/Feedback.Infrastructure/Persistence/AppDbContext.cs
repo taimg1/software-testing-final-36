@@ -1,7 +1,7 @@
-using Feedback.Api.Domain;
+using Feedback.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Feedback.Api.Data;
+namespace Feedback.Infrastructure.Persistence;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {

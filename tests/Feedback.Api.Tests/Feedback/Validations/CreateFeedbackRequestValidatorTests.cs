@@ -1,6 +1,6 @@
-using Feedback.Api.Domain;
-using Feedback.Api.Feedback.Requests;
-using Feedback.Api.Feedback.Validations;
+using Feedback.Application.Feedback.Requests;
+using Feedback.Application.Feedback.Validators;
+using Feedback.Domain;
 using FluentValidation.TestHelper;
 
 namespace Feedback.Api.Tests.Feedback.Validations;

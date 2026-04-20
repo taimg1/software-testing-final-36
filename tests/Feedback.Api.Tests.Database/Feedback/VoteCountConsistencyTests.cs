@@ -1,4 +1,4 @@
-using Feedback.Api.Domain;
+using Feedback.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Feedback.Api.Tests.Database.Feedback;
@@ -75,7 +75,7 @@ public class VoteCountConsistencyTests : IClassFixture<FeedbackDatabaseFixture>
         await using var db = _fixture.CreateDbContext();
 
         var feedbackCount = await db.Feedbacks.CountAsync();
-        feedbackCount.ShouldBeGreaterThanOrEqualTo(200);
+        feedbackCount.ShouldBeGreaterThanOrEqualTo(10_000);
 
         var voteCount = await db.Votes.CountAsync();
         voteCount.ShouldBeGreaterThan(0);

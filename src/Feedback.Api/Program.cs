@@ -1,5 +1,6 @@
-using Feedback.Api.Data;
-using Feedback.Api.Services;
+using Feedback.Application.Abstractions;
+using Feedback.Infrastructure.Persistence;
+using Feedback.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddValidatorsFromAssemblyContaining<Feedback.Application.ApplicationAssembly>();
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>("database");

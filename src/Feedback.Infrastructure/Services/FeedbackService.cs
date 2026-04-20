@@ -1,11 +1,11 @@
-using Feedback.Api.Data;
-using Feedback.Api.Domain;
-using Feedback.Api.Feedback.Mappers;
-using Feedback.Api.Feedback.Requests;
-using Feedback.Api.Feedback.Responses;
+using Feedback.Application.Abstractions;
+using Feedback.Application.Feedback.Requests;
+using Feedback.Application.Feedback.Responses;
+using Feedback.Domain;
+using Feedback.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Feedback.Api.Services;
+namespace Feedback.Infrastructure.Services;
 
 public class FeedbackService(AppDbContext db, TimeProvider timeProvider) : IFeedbackService
 {
@@ -42,7 +42,7 @@ public class FeedbackService(AppDbContext db, TimeProvider timeProvider) : IFeed
             : query.OrderByDescending(f => f.CreatedAt);
 
         var items = await query.ToListAsync();
-        return items.Select(FeedbackMapper.ToResponse).ToList();
+        return items.Select(ToResponse).ToList();
     }
 
     public async Task<FeedbackDetailResponse> GetByIdAsync(int id)
@@ -52,7 +52,7 @@ public class FeedbackService(AppDbContext db, TimeProvider timeProvider) : IFeed
             .FirstOrDefaultAsync(f => f.Id == id)
             ?? throw new KeyNotFoundException($"Feedback {id} not found.");
 
-        return FeedbackMapper.ToDetailResponse(item);
+        return ToDetailResponse(item);
     }
 
     public async Task<FeedbackResponse> CreateAsync(CreateFeedbackRequest request)
@@ -72,7 +72,7 @@ public class FeedbackService(AppDbContext db, TimeProvider timeProvider) : IFeed
 
         db.Feedbacks.Add(item);
         await db.SaveChangesAsync();
-        return FeedbackMapper.ToResponse(item);
+        return ToResponse(item);
     }
 
     public async Task<FeedbackResponse> UpdateAsync(int id, UpdateFeedbackRequest request)
@@ -86,7 +86,7 @@ public class FeedbackService(AppDbContext db, TimeProvider timeProvider) : IFeed
         item.Priority = request.Priority;
 
         await db.SaveChangesAsync();
-        return FeedbackMapper.ToResponse(item);
+        return ToResponse(item);
     }
 
     public async Task<FeedbackResponse> UpdateStatusAsync(int id, FeedbackStatus newStatus)
@@ -100,7 +100,7 @@ public class FeedbackService(AppDbContext db, TimeProvider timeProvider) : IFeed
 
         item.Status = newStatus;
         await db.SaveChangesAsync();
-        return FeedbackMapper.ToResponse(item);
+        return ToResponse(item);
     }
 
     public async Task<VoteResponse> AddVoteAsync(int feedbackId, AddVoteRequest request)
@@ -129,7 +129,7 @@ public class FeedbackService(AppDbContext db, TimeProvider timeProvider) : IFeed
         item.VoteCount++;
         await db.SaveChangesAsync();
 
-        return FeedbackMapper.ToVoteResponse(vote);
+        return ToVoteResponse(vote);
     }
 
     public async Task RemoveVoteAsync(int feedbackId, string voterEmail)
@@ -149,7 +149,7 @@ public class FeedbackService(AppDbContext db, TimeProvider timeProvider) : IFeed
 
     public async Task<CommentResponse> AddCommentAsync(int feedbackId, AddCommentRequest request)
     {
-        var item = await db.Feedbacks.FindAsync(feedbackId)
+        _ = await db.Feedbacks.FindAsync(feedbackId)
             ?? throw new KeyNotFoundException($"Feedback {feedbackId} not found.");
 
         var comment = new Comment
@@ -164,7 +164,7 @@ public class FeedbackService(AppDbContext db, TimeProvider timeProvider) : IFeed
         db.Comments.Add(comment);
         await db.SaveChangesAsync();
 
-        return FeedbackMapper.ToCommentResponse(comment);
+        return ToCommentResponse(comment);
     }
 
     public async Task<FeedbackStatsResponse> GetStatsAsync()
@@ -181,4 +181,22 @@ public class FeedbackService(AppDbContext db, TimeProvider timeProvider) : IFeed
 
         return new FeedbackStatsResponse(byType, byStatus);
     }
+
+    private static FeedbackResponse ToResponse(FeedbackItem item) => new(
+        item.Id, item.Title, item.Description,
+        item.Type.ToString(), item.Status.ToString(), item.Priority.ToString(),
+        item.AuthorName, item.AuthorEmail, item.CreatedAt, item.VoteCount);
+
+    private static FeedbackDetailResponse ToDetailResponse(FeedbackItem item) => new(
+        item.Id, item.Title, item.Description,
+        item.Type.ToString(), item.Status.ToString(), item.Priority.ToString(),
+        item.AuthorName, item.AuthorEmail, item.CreatedAt, item.VoteCount,
+        item.Comments.Select(ToCommentResponse).ToList());
+
+    private static CommentResponse ToCommentResponse(Comment comment) => new(
+        comment.Id, comment.FeedbackId, comment.AuthorName,
+        comment.Content, comment.CreatedAt, comment.IsOfficial);
+
+    private static VoteResponse ToVoteResponse(Vote vote) => new(
+        vote.Id, vote.FeedbackId, vote.VoterEmail, vote.CreatedAt);
 }

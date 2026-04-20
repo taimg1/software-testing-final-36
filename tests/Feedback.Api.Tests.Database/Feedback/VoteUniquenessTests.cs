@@ -1,4 +1,4 @@
-using Feedback.Api.Domain;
+using Feedback.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Feedback.Api.Tests.Database.Feedback;

@@ -1,8 +1,8 @@
-using Feedback.Api.Domain;
-using Feedback.Api.Feedback.Requests;
-using Feedback.Api.Feedback.Responses;
+using Feedback.Application.Feedback.Requests;
+using Feedback.Application.Feedback.Responses;
+using Feedback.Domain;
 
-namespace Feedback.Api.Services;
+namespace Feedback.Application.Abstractions;
 
 public interface IFeedbackService
 {

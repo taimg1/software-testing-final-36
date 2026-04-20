@@ -1,8 +1,8 @@
 using AutoFixture;
-using Feedback.Api.Data;
-using Feedback.Api.Domain;
-using Feedback.Api.Feedback.Requests;
-using Feedback.Api.Services;
+using Feedback.Application.Feedback.Requests;
+using Feedback.Domain;
+using Feedback.Infrastructure.Persistence;
+using Feedback.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Time.Testing;
 
@@ -222,11 +222,11 @@ public class FeedbackServiceTests : IDisposable
     [Fact]
     public async Task GetAll_WithTypeFilter_ReturnsOnlyMatchingAsync()
     {
-        await _sut.CreateAsync(ValidCreateRequest() with { Type = Domain.FeedbackType.Bug });
-        await _sut.CreateAsync(ValidCreateRequest() with { Type = Domain.FeedbackType.Feature });
-        await _sut.CreateAsync(ValidCreateRequest() with { Type = Domain.FeedbackType.Bug });
+        await _sut.CreateAsync(ValidCreateRequest() with { Type = FeedbackType.Bug });
+        await _sut.CreateAsync(ValidCreateRequest() with { Type = FeedbackType.Feature });
+        await _sut.CreateAsync(ValidCreateRequest() with { Type = FeedbackType.Bug });
 
-        var result = await _sut.GetAllAsync(Domain.FeedbackType.Bug, null, false);
+        var result = await _sut.GetAllAsync(FeedbackType.Bug, null, false);
         result.Count.ShouldBe(2);
         result.ShouldAllBe(f => f.Type == "Bug");
     }
@@ -253,8 +253,8 @@ public class FeedbackServiceTests : IDisposable
     private static CreateFeedbackRequest ValidCreateRequest() => new(
         Title: "Test Feedback",
         Description: "Test description",
-        Type: Domain.FeedbackType.Feature,
-        Priority: Domain.FeedbackPriority.Medium,
+        Type: FeedbackType.Feature,
+        Priority: FeedbackPriority.Medium,
         AuthorName: "John Doe",
         AuthorEmail: "john@example.com");
 }

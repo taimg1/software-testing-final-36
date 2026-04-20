@@ -1,6 +1,6 @@
-using Feedback.Api.Domain;
+using Feedback.Domain;
 
-namespace Feedback.Api.Feedback.Requests;
+namespace Feedback.Application.Feedback.Requests;
 
 public record CreateFeedbackRequest(
     string Title,

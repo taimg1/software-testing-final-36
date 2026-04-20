@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using AutoFixture;
-using Feedback.Api.Data;
-using Feedback.Api.Domain;
-using Feedback.Api.Feedback.Requests;
-using Feedback.Api.Feedback.Responses;
+using Feedback.Application.Feedback.Requests;
+using Feedback.Application.Feedback.Responses;
+using Feedback.Domain;
+using Feedback.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Feedback.Api.Tests.Integration.Feedback;

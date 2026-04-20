@@ -1,5 +1,8 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Feedback.Domain/Feedback.Domain.csproj" />
+    <Project Path="src/Feedback.Application/Feedback.Application.csproj" />
+    <Project Path="src/Feedback.Infrastructure/Feedback.Infrastructure.csproj" />
     <Project Path="src/Feedback.Api/Feedback.Api.csproj" />
   </Folder>
   <Folder Name="/tests/">

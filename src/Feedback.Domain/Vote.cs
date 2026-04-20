@@ -1,4 +1,4 @@
-namespace Feedback.Api.Domain;
+namespace Feedback.Domain;
 
 public class Vote
 {

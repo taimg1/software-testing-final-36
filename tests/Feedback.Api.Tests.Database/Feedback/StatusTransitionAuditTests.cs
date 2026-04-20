@@ -1,4 +1,4 @@
-using Feedback.Api.Domain;
+using Feedback.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Feedback.Api.Tests.Database.Feedback;
@@ -22,7 +22,7 @@ public class StatusTransitionAuditTests : IClassFixture<FeedbackDatabaseFixture>
             .Distinct()
             .ToListAsync();
 
-        // 200 items spread across 6 statuses — all should appear
+        // 10,000 items spread across 6 statuses — all should appear
         statuses.ShouldContain(FeedbackStatus.Open);
         statuses.ShouldContain(FeedbackStatus.UnderReview);
         statuses.ShouldContain(FeedbackStatus.Planned);
